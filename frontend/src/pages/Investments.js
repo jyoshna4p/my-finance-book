@@ -158,14 +158,14 @@ export default function Investments() {
                   const p = priceFor(s.s, s.base);
                   const chg = ((p - s.base) / s.base) * 100;
                   return (
-                    <button key={s.s} data-testid={`stock-${s.s}`} onClick={() => setSelected(s.s)} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm ${selected === s.s ? "bg-cyan-500/10 text-cyan-300" : "hover:bg-zinc-800/60 text-zinc-300"}`}>
+                    <div key={s.s} data-testid={`stock-${s.s}`} onClick={() => setSelected(s.s)} role="button" tabIndex={0} className={`cursor-pointer w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm ${selected === s.s ? "bg-cyan-500/10 text-cyan-300" : "hover:bg-zinc-800/60 text-zinc-300"}`}>
                       <span className="font-display">{s.s}</span>
                       <span className="flex items-center gap-3">
                         <span className="font-mono-data text-xs">{s.currency === "INR" ? "₹" : "$"}{p.toFixed(2)}</span>
                         <span className={`text-[10px] font-mono-data ${chg >= 0 ? "text-emerald-400" : "text-red-400"}`}>{chg >= 0 ? "+" : ""}{chg.toFixed(1)}%</span>
-                        <button data-testid={`watch-${s.s}`} onClick={(e) => { e.stopPropagation(); toggleWatch(s.s); }} className={`text-xs ${watch.includes(s.s) ? "text-cyan-300" : "text-zinc-500 hover:text-white"}`}>★</button>
+                        <span data-testid={`watch-${s.s}`} role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); toggleWatch(s.s); }} className={`text-xs cursor-pointer ${watch.includes(s.s) ? "text-cyan-300" : "text-zinc-500 hover:text-white"}`}>★</span>
                       </span>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
