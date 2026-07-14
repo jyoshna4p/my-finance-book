@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { STOCKS, INDICES, FNO, MUTUAL_FUNDS, ALTERNATIVES, NEWS, priceFor, seriesFor } from "@/lib/marketData";
+import { STOCKS, FNO, MUTUAL_FUNDS, ALTERNATIVES, NEWS, priceFor, seriesFor } from "@/lib/marketData";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, BarChart, 
 import { Plus, Trash2, TrendingUp, TrendingDown, Sparkles } from "lucide-react";
 import { fmtINR } from "@/lib/taxConfig";
 import AiPanel from "@/components/AiPanel";
+import IndicesTicker from "@/components/IndicesTicker";
 import { getPortfolio, savePortfolio } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -50,7 +51,7 @@ export default function Investments() {
     setHoldings((h) => [...h, { sym: newSym, qty: Number(newQty), avg: Number(newAvg) }]);
     setNewSym(""); setNewQty(10); setNewAvg(2500);
   };
-  const removeHolding = (i) => setHoldings((h) => h.filter((_, x) => x !== i));
+  const removeHolding = (h) => setHoldings((cur) => cur.filter((x) => x !== h));
   const toggleWatch = (s) => setWatch((w) => w.includes(s) ? w.filter((x) => x !== s) : [...w, s]);
   const persist = async () => { await savePortfolio(holdings, watch); toast.success("Portfolio saved"); };
 
@@ -95,23 +96,7 @@ export default function Investments() {
       </div>
 
       {/* Indices ticker */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden" data-testid="indices-ticker">
-        <div className="flex overflow-hidden">
-          <div className="mfb-ticker flex gap-6 py-3 px-4 whitespace-nowrap">
-            {[...INDICES, ...INDICES].map((i, k) => {
-              const p = priceFor(i.s, i.base);
-              const chg = ((p - i.base) / i.base) * 100;
-              return (
-                <span key={k} className="flex items-center gap-2 text-sm">
-                  <span className="text-zinc-400 font-display">{i.s}</span>
-                  <span className="font-mono-data text-white">{i.base > 1000 ? p.toFixed(0) : p.toFixed(2)}</span>
-                  <span className={`font-mono-data text-xs ${chg >= 0 ? "text-emerald-400" : "text-red-400"}`}>{chg >= 0 ? "+" : ""}{chg.toFixed(2)}%</span>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      <IndicesTicker />
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="bg-zinc-900 border border-zinc-800">
@@ -242,18 +227,18 @@ export default function Investments() {
                 </thead>
                 <tbody>
                   {holdings.length === 0 && <tr><td colSpan={6} className="text-center text-zinc-500 py-8 text-xs">No holdings yet. Add one below.</td></tr>}
-                  {holdings.map((h, i) => {
+                  {holdings.map((h) => {
                     const meta = stockMap[h.sym]; if (!meta) return null;
                     const p = priceFor(meta.s, meta.base);
                     const pnl = (p - h.avg) * h.qty;
                     return (
-                      <tr key={i} className="border-t border-zinc-800 text-zinc-300">
+                      <tr key={`${h.sym}-${h.avg}-${h.qty}`} className="border-t border-zinc-800 text-zinc-300">
                         <td className="px-4 py-2 font-display">{h.sym}</td>
                         <td className="text-center font-mono-data">{h.qty}</td>
                         <td className="text-center font-mono-data">{h.avg}</td>
                         <td className="text-center font-mono-data">{p.toFixed(2)}</td>
                         <td className={`text-center font-mono-data ${pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{pnl >= 0 ? "+" : ""}{fmtINR(pnl)}</td>
-                        <td><Button size="sm" variant="ghost" onClick={() => removeHolding(i)}><Trash2 className="w-3.5 h-3.5 text-red-400" /></Button></td>
+                        <td><Button size="sm" variant="ghost" onClick={() => removeHolding(h)}><Trash2 className="w-3.5 h-3.5 text-red-400" /></Button></td>
                       </tr>
                     );
                   })}
@@ -340,8 +325,8 @@ export default function Investments() {
             <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6">
               <div className="font-display text-white">Stock Comparison</div>
               <div className="mt-4 grid grid-cols-3 gap-3">
-                {[[cmpA, setCmpA], [cmpB, setCmpB], [cmpC, setCmpC]].map(([v, set], i) => (
-                  <select key={i} data-testid={`cmp-${i}`} value={v} onChange={(e) => set(e.target.value)} className="bg-zinc-950 border border-zinc-800 rounded-md px-2 py-2 text-white text-xs">
+                {[{ id: "cmp-a", v: cmpA, set: setCmpA }, { id: "cmp-b", v: cmpB, set: setCmpB }, { id: "cmp-c", v: cmpC, set: setCmpC }].map((cfg, i) => (
+                  <select key={cfg.id} data-testid={`cmp-${i}`} value={cfg.v} onChange={(e) => cfg.set(e.target.value)} className="bg-zinc-950 border border-zinc-800 rounded-md px-2 py-2 text-white text-xs">
                     {STOCKS.map((s) => <option key={s.s}>{s.s}</option>)}
                   </select>
                 ))}

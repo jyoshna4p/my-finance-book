@@ -215,7 +215,7 @@ export default function GST() {
               <div className="font-display text-white">{p.p}</div>
               <ol className="mt-4 space-y-2">
                 {p.steps.map((s, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-zinc-300">
+                  <li key={s} className="flex gap-3 text-sm text-zinc-300">
                     <span className="w-5 h-5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-mono-data flex items-center justify-center shrink-0">{i + 1}</span>
                     {s}
                   </li>

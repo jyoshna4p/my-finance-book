@@ -1,0 +1,55 @@
+{
+  "summary": "Iteration 2 — full re-test after code-review fixes (httpOnly cookie auth, stable rids, split memos, extracted components, type hints). Backend 17/17 pytest pass (including AI which now works — LLM budget is topped up). Frontend all critical flows verified: cookie-only auth (no localStorage.mfb_token), reload keeps session via cookie, all 6 nav pages, extracted IndicesTicker visible, portfolio Add/Save/persist round-trip, CostAudit XBRL renders with <in-cca:CorporateIdentityNumber>, TDS delete-by-rid works across multiple deletions (5→4→3 rows), logout clears cookie and redirects to landing. Nested <button> in <button> issue from iteration_1 is FIXED (watch-* is now <span role=button>). Only remaining console warning is a pre-existing cosmetic <span> inside <option> hydration warning in IncomeTax FY-select and the harmless Recharts width/height=0 warning.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "IncomeTax — FY select options",
+        "issue": "Pre-existing hydration warning: '<span> cannot be a child of <option>'. Not new; cosmetic; does not affect functionality.",
+        "selector": "[data-testid='fy-select'] option",
+        "priority": "LOW"
+      },
+      {
+        "component": "Investments — Recharts container",
+        "issue": "Pre-existing warning: 'The width(-1) and height(-1) of chart should be greater than 0'. Cosmetic; chart still renders after container settles.",
+        "selector": ".recharts-responsive-container",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_backend.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Fix pre-existing <span> inside <option> hydration warning in IncomeTax fy-select (render option children as plain strings).",
+    "(Optional) Give the Recharts ResponsiveContainer an explicit minHeight to silence width/height=0 warning."
+  ],
+  "critical_code_review_comments": [
+    "server.py current_user() correctly prefers httpOnly cookie and falls back to Bearer — good backward-compat.",
+    "server.py set_session_cookie() sets httponly=True, secure=True, samesite='lax', path='/' — matches spec.",
+    "server.py /auth/logout uses response.delete_cookie(COOKIE_NAME, path='/') — correct.",
+    "frontend/src/lib/api.js has withCredentials:true on the shared axios instance and no localStorage — clean.",
+    "frontend/src/lib/auth.js uses fetchMe() as source-of-truth on mount and after login; setSession() no longer touches storage — matches migration goal.",
+    "TDS.js rows carry a stable rid (seed-1/2/3 for seed rows, r-<Date.now()> for new) and deletion uses filter(x => x.rid !== r.rid) — no index-based key. Verified deletion across 2 successive removals produces correct row counts.",
+    "CostAudit.js — helpers extracted to /app/frontend/src/lib/costAudit.js and consumed via split useMemo. XBRL output still includes <in-cca:CorporateIdentityNumber>.",
+    "IndicesTicker and LoginPanel are now standalone components — reduces Landing.js / Investments.js complexity.",
+    "test_backend.py — added type hints (Dict[str, Any]), added TestLogout class, cookie-auth test (test_cookie_authenticates_me_endpoint) and replaced `is True` with truthy .get('ok') — matches spec."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (17/17 pytest incl. AI)",
+    "frontend": "100% (all reviewed flows: intro, skip, cookie-only login, no-localStorage, reload persistence, 6 nav, indices-ticker, portfolio round-trip, XBRL CIN tag, TDS stable-rid deletion, logout+cookie clear+redirect)"
+  },
+  "test_credentials": "demo@myfinancebook.in / Demo@123 ; ca@myfinancebook.in / CA@123456 ; admin@myfinancebook.in / Admin@123 (from /app/memory/test_credentials.md — all verified working).",
+  "seed_data_creation": "seed_users() auto-runs on backend startup — idempotent. Portfolio test added a holding with qty=7 avg=999 for demo — safe (isolated to demo account). TDS UI test added TEST_Vendor_A and TEST_Vendor_B and then deleted them — no residual state.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend & frontend both fully green. AI endpoint (/api/ai/suggest) is now WORKING — the LLM budget quota issue from iteration_1 has been resolved (both anthropic claude-sonnet-4-5-20250929 and openai gpt-5.2 return real completions; test_ai_suggest_anthropic and test_ai_suggest_openai both pass). Cookie-only auth is verified end-to-end: browser stores mfb_session as httpOnly+secure+SameSite=Lax and no mfb_token in localStorage. Base URL: https://finance-book-hub.preview.emergentagent.com. Run backend tests with `REACT_APP_BACKEND_URL=<url> pytest backend/tests/test_backend.py -v`.",
+  "rca of the issue": "No open issues. Iteration_1 AI-quota RCA is closed (budget topped up). Iteration_1 nested <button> in <button> in Investments.js is closed (watch-* switched to <span role='button'> — verified no such console error on Investments page)."
+}

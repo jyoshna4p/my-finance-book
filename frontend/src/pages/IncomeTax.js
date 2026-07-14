@@ -172,7 +172,7 @@ export default function IncomeTax() {
               <div className="rounded-xl border border-yellow-500/25 bg-yellow-500/5 p-5">
                 <div className="flex items-center gap-2 text-yellow-300 mb-2"><Lightbulb className="w-4 h-4" /><span className="font-display text-sm">Refund Maximizer</span></div>
                 <ul className="text-xs text-zinc-300 space-y-1.5 leading-relaxed">
-                  {loopholes.map((l, i) => <li key={i}>· {l}</li>)}
+                  {loopholes.map((l) => <li key={l}>· {l}</li>)}
                 </ul>
               </div>
             )}
@@ -189,7 +189,7 @@ export default function IncomeTax() {
           <h3 className="font-display text-white text-lg">Step-by-step filing on incometax.gov.in</h3>
           <ol className="mt-5 space-y-3">
             {FILING_STEPS.map((f, i) => (
-              <li key={i} className="flex gap-4 p-4 border border-zinc-800 rounded-lg bg-zinc-950/40">
+              <li key={f.s} className="flex gap-4 p-4 border border-zinc-800 rounded-lg bg-zinc-950/40">
                 <span className="w-8 h-8 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono-data flex items-center justify-center shrink-0">{i + 1}</span>
                 <div>
                   <div className="font-display text-white text-sm">{f.s}</div>

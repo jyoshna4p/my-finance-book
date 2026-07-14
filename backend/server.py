@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header, Response, Request, Cookie
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -7,7 +7,7 @@ import logging
 import bcrypt
 import jwt as pyjwt
 from pathlib import Path
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 
@@ -21,12 +21,22 @@ db = client[os.environ["DB_NAME"]]
 JWT_SECRET = os.environ["JWT_SECRET"]
 JWT_ALG = "HS256"
 JWT_EXP_HOURS = 24 * 7
+COOKIE_NAME = "mfb_session"
 ALLOWED_EMAILS = {
     e.strip().lower() for e in os.environ.get("ALLOWED_EMAILS", "").split(",") if e.strip()
 }
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
 app = FastAPI(title="My Finance Book API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 logging.basicConfig(level=logging.INFO)
@@ -40,15 +50,9 @@ class LoginBody(BaseModel):
     remember: bool = False
 
 
-class RegisterBody(BaseModel):
-    email: EmailStr
-    password: str
-    name: Optional[str] = None
-
-
 class AIQueryBody(BaseModel):
     prompt: str
-    provider: str = "anthropic"  # anthropic | openai
+    provider: str = "anthropic"
     model: Optional[str] = None
     system: Optional[str] = None
 
@@ -79,23 +83,44 @@ def make_token(email: str, hours: int = JWT_EXP_HOURS) -> str:
     return pyjwt.encode(payload, JWT_SECRET, algorithm=JWT_ALG)
 
 
-async def current_user(authorization: Optional[str] = Header(None)) -> str:
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(401, "Missing bearer token")
-    token = authorization.split(" ", 1)[1]
+def set_session_cookie(response: Response, token: str, hours: int) -> None:
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        max_age=hours * 3600,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/",
+    )
+
+
+async def current_user(
+    request: Request,
+    authorization: Optional[str] = Header(None),
+    mfb_session: Optional[str] = Cookie(None),
+) -> str:
+    """Resolve current user from either httpOnly cookie (preferred) or Bearer header (legacy/tests)."""
+    token: Optional[str] = None
+    if mfb_session:
+        token = mfb_session
+    elif authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1]
+    if not token:
+        raise HTTPException(401, "Not authenticated")
     try:
         payload = pyjwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
     except pyjwt.PyJWTError:
-        raise HTTPException(401, "Invalid or expired token")
+        raise HTTPException(401, "Invalid or expired session")
     email = payload.get("sub")
     if not email:
-        raise HTTPException(401, "Invalid token payload")
+        raise HTTPException(401, "Invalid session payload")
     return email
 
 
 # ---------- Seed users ----------
 @app.on_event("startup")
-async def seed_users():
+async def seed_users() -> None:
     seed = [
         ("demo@myfinancebook.in", "Demo@123", "Demo User"),
         ("ca@myfinancebook.in", "CA@123456", "Chartered Accountant"),
@@ -118,18 +143,17 @@ async def seed_users():
 
 # ---------- Routes ----------
 @api_router.get("/")
-async def root():
+async def root() -> dict:
     return {"service": "My Finance Book", "status": "ok"}
 
 
 @api_router.get("/auth/allowlist")
-async def get_allowlist():
-    # Non-sensitive - just tells frontend which addresses are allowed to attempt login
+async def get_allowlist() -> dict:
     return {"emails": sorted(list(ALLOWED_EMAILS))}
 
 
 @api_router.post("/auth/login")
-async def login(body: LoginBody):
+async def login(body: LoginBody, response: Response) -> dict:
     email_l = body.email.lower()
     if ALLOWED_EMAILS and email_l not in ALLOWED_EMAILS:
         raise HTTPException(403, "This email is not authorised to access My Finance Book.")
@@ -138,27 +162,40 @@ async def login(body: LoginBody):
         raise HTTPException(401, "Invalid credentials")
     hours = JWT_EXP_HOURS if body.remember else 12
     token = make_token(email_l, hours=hours)
+    # Set httpOnly cookie (primary auth channel)
+    set_session_cookie(response, token, hours)
+    # Also return token for backward-compatible / non-browser callers (curl, pytest)
     return {"token": token, "user": {"email": email_l, "name": user.get("name")}}
 
 
+@api_router.post("/auth/logout")
+async def logout(response: Response) -> dict:
+    response.delete_cookie(COOKIE_NAME, path="/")
+    return {"ok": True}
+
+
 @api_router.get("/auth/me")
-async def me(email: str = Depends(current_user)):
+async def me(email: str = Depends(current_user)) -> dict:
     user = await db.users.find_one({"email": email}, {"_id": 0, "password": 0})
     return {"user": user}
 
 
 @api_router.post("/portfolio/save")
-async def save_portfolio(body: SavePortfolioBody, email: str = Depends(current_user)):
+async def save_portfolio(body: SavePortfolioBody, email: str = Depends(current_user)) -> dict:
     await db.portfolios.update_one(
         {"email": email},
-        {"$set": {"holdings": body.holdings, "watchlist": body.watchlist, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        {"$set": {
+            "holdings": body.holdings,
+            "watchlist": body.watchlist,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }},
         upsert=True,
     )
     return {"ok": True}
 
 
 @api_router.get("/portfolio")
-async def get_portfolio(email: str = Depends(current_user)):
+async def get_portfolio(email: str = Depends(current_user)) -> dict:
     doc = await db.portfolios.find_one({"email": email}, {"_id": 0})
     if not doc:
         return {"holdings": [], "watchlist": []}
@@ -166,7 +203,7 @@ async def get_portfolio(email: str = Depends(current_user)):
 
 
 @api_router.post("/ai/suggest")
-async def ai_suggest(body: AIQueryBody, email: str = Depends(current_user)):
+async def ai_suggest(body: AIQueryBody, email: str = Depends(current_user)) -> dict:
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
     except Exception as e:
@@ -202,15 +239,7 @@ async def ai_suggest(body: AIQueryBody, email: str = Depends(current_user)):
 
 app.include_router(api_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_db_client() -> None:
     client.close()

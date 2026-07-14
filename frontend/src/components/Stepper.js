@@ -8,7 +8,7 @@ export default function Stepper({ steps, active, onSelect }) {
         const cur = i === active;
         return (
           <button
-            key={i}
+            key={s}
             data-testid={`step-${i}`}
             onClick={() => onSelect && onSelect(i)}
             className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 rounded-lg border transition-colors duration-200 whitespace-nowrap ${

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fmtINR } from "@/lib/taxConfig";
 import { ArrowRight, ArrowLeft, AlertTriangle, CheckCircle2, FileText } from "lucide-react";
+import { computeEligibility, computeVariances, computeCapacity, computeReconciledProfit, buildXbrl } from "@/lib/costAudit";
 
 const STEPS = ["Eligibility", "3-Way Recon", "CAS-2 Capacity", "XBRL & AI"];
 
@@ -19,50 +20,40 @@ export default function CostAudit() {
   const [sez, setSez] = useState(false);
   const [cin, setCin] = useState("U74999MH2018PTC012345");
 
-  const recordsReq = overall >= 35 && !sez;
-  const auditReq = sez ? false : sector === "Regulated" ? (overall >= 50 && product >= 25) : (overall >= 100 && product >= 35);
+  const { recordsReq, auditReq } = useMemo(
+    () => computeEligibility({ sector, overall, product, sez }),
+    [sector, overall, product, sez]
+  );
 
   const [pl, setPl] = useState(1250000000);
   const [gstr, setGstr] = useState(1245000000);
   const [cra, setCra] = useState(1247500000);
-  const varAB = pl - gstr, varAC = pl - cra, varBC = gstr - cra;
+  const { varAB, varAC, varBC } = useMemo(
+    () => computeVariances({ pl, gstr, cra }),
+    [pl, gstr, cra]
+  );
 
   const [installed, setInstalled] = useState(87600);
   const [planned, setPlanned] = useState(4380);
   const [actual, setActual] = useState(72500);
-  const achievable = installed - planned;
-  const abnormalIdle = Math.max(0, achievable - actual);
-  const utilisation = actual / installed * 100;
-  const idlePct = abnormalIdle / installed * 100;
+  const capacity = useMemo(
+    () => computeCapacity({ installed, planned, actual }),
+    [installed, planned, actual]
+  );
+  const { achievable, abnormalIdle, utilisation, idlePct } = capacity;
 
   const [profitCost, setProfitCost] = useState(15200000);
   const [incNotCA, setIncNotCA] = useState(120000);
   const [expNotCA, setExpNotCA] = useState(340000);
-  const reconciledProfit = profitCost + incNotCA - expNotCA;
+  const reconciledProfit = useMemo(
+    () => computeReconciledProfit({ profitCost, incNotCA, expNotCA }),
+    [profitCost, incNotCA, expNotCA]
+  );
 
-  const xbrl = useMemo(() => (
-`<?xml version="1.0" encoding="UTF-8"?>
-<xbrl xmlns="http://www.xbrl.org/2003/instance"
-      xmlns:in-cca="http://www.mca.gov.in/xbrl/cost-audit/2020">
-  <in-cca:CorporateIdentityNumber>${cin}</in-cca:CorporateIdentityNumber>
-  <in-cca:SectorClassification>${sector}</in-cca:SectorClassification>
-  <in-cca:ProductServiceDetailsTable>
-    <in-cca:AggregateTurnover>${(product * 10000000).toLocaleString("en-IN")}</in-cca:AggregateTurnover>
-  </in-cca:ProductServiceDetailsTable>
-  <in-cca:QuantitativeInformationProduction>
-    <in-cca:InstalledCapacityHours>${installed}</in-cca:InstalledCapacityHours>
-    <in-cca:AchievableCapacityHours>${achievable}</in-cca:AchievableCapacityHours>
-    <in-cca:ActualProductionHours>${actual}</in-cca:ActualProductionHours>
-    <in-cca:AbnormalIdleCapacityHours>${abnormalIdle}</in-cca:AbnormalIdleCapacityHours>
-  </in-cca:QuantitativeInformationProduction>
-  <in-cca:CostReconciliationStatementTable>
-    <in-cca:ProfitAsPerCostRecords>${profitCost.toLocaleString("en-IN")}</in-cca:ProfitAsPerCostRecords>
-    <in-cca:IncomeNotConsideredInCost>${incNotCA.toLocaleString("en-IN")}</in-cca:IncomeNotConsideredInCost>
-    <in-cca:ExpenseNotConsideredInCost>${expNotCA.toLocaleString("en-IN")}</in-cca:ExpenseNotConsideredInCost>
-    <in-cca:ReconciledFinancialProfit>${reconciledProfit.toLocaleString("en-IN")}</in-cca:ReconciledFinancialProfit>
-  </in-cca:CostReconciliationStatementTable>
-</xbrl>`
-  ), [cin, sector, product, installed, achievable, actual, abnormalIdle, profitCost, incNotCA, expNotCA, reconciledProfit]);
+  const xbrl = useMemo(
+    () => buildXbrl({ cin, sector, product, installed, achievable, actual, abnormalIdle, profitCost, incNotCA, expNotCA, reconciledProfit }),
+    [cin, sector, product, installed, achievable, actual, abnormalIdle, profitCost, incNotCA, expNotCA, reconciledProfit]
+  );
 
   return (
     <div className="space-y-6" data-testid="cost-audit-page">

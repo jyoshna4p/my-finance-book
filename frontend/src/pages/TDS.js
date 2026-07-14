@@ -24,10 +24,10 @@ const PAYMENT_CODES = [
 const isPanValid = (pan) => /^[A-Z]{5}\d{4}[A-Z]$/.test(pan || "");
 
 export default function TDS() {
-  const [rows, setRows] = useState([
-    { vendor: "ABC Contractor", pan: "AABCA1234E", code: 1022, ytd: 85000, amt: 25000 },
-    { vendor: "XYZ Consulting", pan: "", code: 1034, ytd: 45000, amt: 15000 },
-    { vendor: "Rentwell LLP", pan: "AAAFR9876Q", code: 1044, ytd: 220000, amt: 30000 },
+  const [rows, setRows] = useState(() => [
+    { rid: "seed-1", vendor: "ABC Contractor", pan: "AABCA1234E", code: 1022, ytd: 85000, amt: 25000 },
+    { rid: "seed-2", vendor: "XYZ Consulting", pan: "", code: 1034, ytd: 45000, amt: 15000 },
+    { rid: "seed-3", vendor: "Rentwell LLP", pan: "AAAFR9876Q", code: 1044, ytd: 220000, amt: 30000 },
   ]);
   const [newRow, setNewRow] = useState({ vendor: "", pan: "", code: 1022, ytd: 0, amt: 0 });
 
@@ -46,7 +46,7 @@ export default function TDS() {
 
   const addRow = () => {
     if (!newRow.vendor) return;
-    setRows((r) => [...r, { ...newRow, code: Number(newRow.code) }]);
+    setRows((r) => [...r, { ...newRow, rid: `r-${Date.now()}`, code: Number(newRow.code) }]);
     setNewRow({ vendor: "", pan: "", code: 1022, ytd: 0, amt: 0 });
   };
 
@@ -64,11 +64,11 @@ export default function TDS() {
             <tr><th className="text-left px-4 py-3">Vendor</th><th>PAN</th><th>Payment Code</th><th>YTD Paid</th><th>This Payment</th><th>Rate</th><th>TDS</th><th>Status</th><th></th></tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => {
+            {rows.map((r) => {
               const c = compute(r);
               const panBad = !isPanValid(r.pan);
               return (
-                <tr key={i} className="border-t border-zinc-800 text-zinc-300">
+                <tr key={r.rid} className="border-t border-zinc-800 text-zinc-300">
                   <td className="px-4 py-2 font-display">{r.vendor}</td>
                   <td className={`text-center font-mono-data ${panBad ? "text-red-400" : "text-zinc-300"}`}>{r.pan || "— missing —"}</td>
                   <td className="text-center font-mono-data text-cyan-300">{r.code} <span className="text-[10px] text-zinc-500 block">{c.meta.desc}</span></td>
@@ -77,7 +77,7 @@ export default function TDS() {
                   <td className={`text-center font-mono-data ${panBad ? "text-red-400" : "text-zinc-300"}`}>{(c.effective * 100).toFixed(1)}%{panBad && <span className="text-[10px] block">PAN → 20%</span>}</td>
                   <td className="text-center font-mono-data text-white">{fmtINR(c.tds)}</td>
                   <td className="text-center">{c.exceeded ? <Badge className="bg-red-500/15 text-red-300 border border-red-500/25">Threshold hit</Badge> : c.approaching ? <Badge className="bg-yellow-500/15 text-yellow-300 border border-yellow-500/25">85% reached</Badge> : <Badge className="bg-zinc-800 text-zinc-400">OK</Badge>}</td>
-                  <td><Button size="sm" variant="ghost" onClick={() => setRows((rs) => rs.filter((_, x) => x !== i))}><Trash2 className="w-3.5 h-3.5 text-red-400" /></Button></td>
+                  <td><Button size="sm" variant="ghost" onClick={() => setRows((rs) => rs.filter((x) => x.rid !== r.rid))}><Trash2 className="w-3.5 h-3.5 text-red-400" /></Button></td>
                 </tr>
               );
             })}
