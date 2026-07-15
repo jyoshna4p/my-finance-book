@@ -1,44 +1,33 @@
 # My Finance Book — PRD
 
 ## Original Problem Statement
-Build "My Finance Book" — a dark fintech single-page app with a cinematic landing (auto-playing intro presenting the value proposition → JWT-gated login with a pre-approved email allowlist, Royal Enfield RE-One style) → dashboard with 6 sections:
-
-1. Income Tax Portal (multi-year FY 2023-24 → 2026-27, old vs new regime, refund maximizer, filing guide, AI review)
-2. GST Returns (supply profile, ITC optimizer with 100% GSTR-2B matching, Section 17(5) blocked-credit detector, GSTR-1/2B/3B filing guide)
-3. Investment & AI Wealth (40 stocks, 14 F&O, 18 MFs, 24 alternatives, portfolio + watchlist, AI advisor, SIP calc, comparison, news)
-4. Cost Audit CRA-3 (eligibility, 3-way GST recon, CAS-2 capacity, MCA XBRL, AI diagnostics)
-5. TDS/TCS Ledger (payment codes 1001-1092, PAN checker → 20%, quarterly Form 140/131 preview)
-6. GST Audit multi-way reconciliation (Books ↔ GSTR-1/3B/2B ↔ Purchase Register → DRC-03 directives)
+Dark fintech single-page app with cinematic landing → JWT-gated login (email allowlist, Royal Enfield RE-One style) → 6-section dashboard:
+1. **Income Tax** — multi-year FY 23-24 → 26-27, old vs new regime, refund maximizer, deductions/exemptions/perquisites catalog with per-user applicability.
+2. **GST Returns** — supply profile, ITC optimizer with 100% GSTR-2B matching, Section 17(5) blocked-credit detector, phased filing.
+3. **Investment & AI Wealth** — 40 stocks, 14 F&O, 18 MFs, 24 alternatives, portfolio + watchlist, AI advisor, SIP calc, comparison, news, lumpsum land/gold/flat advisor, per-holding Buy/Sell/Hold signals.
+4. **Cost Audit CRA-3** — 4-phase gated wizard (Statutory Eligibility → Accounts Reconciliation with material/labor/overhead comparator → Cost Variance & AI Review → Downloadable Audit Report + MCA XBRL).
+5. **TDS/TCS Ledger** — payment codes 1001-1092, PAN checker → 20%, quarterly Form 140/131 preview.
+6. **GST Audit** — 5-phase multi-way reconciliation with DRC-03 directives.
 
 ## Architecture
-- **Backend**: FastAPI + MongoDB (motor). JWT (pyjwt) + bcrypt. `emergentintegrations` LlmChat for Claude Sonnet 4.5 / GPT-5.2.
+- **Backend**: FastAPI + MongoDB (motor). JWT (pyjwt) + bcrypt. Session in httpOnly + Secure + SameSite=lax cookie (`mfb_session`). `emergentintegrations` LlmChat for Claude Sonnet 4.5 / GPT-5.2.
 - **Frontend**: React 19 + React Router 7, TailwindCSS, shadcn/ui, Recharts, framer-motion, sonner. Fonts: Outfit + Manrope + JetBrains Mono.
-- **Auth**: `/api/auth/login` verifies email against `ALLOWED_EMAILS` env, then bcrypt. Returns 7-day JWT (12h if "remember" off). Frontend guards `/app/*` routes via `Protected` wrapper.
-
-## Personas
-- CA / CFO managing multiple statutory filings for SMEs.
-- Finance-savvy individual tracking Income Tax, portfolio & TDS in one place.
 
 ## What's Been Implemented (Feb 2026)
-- ✅ Cinematic landing (CSS motion graphics, value-prop grid, Skip Intro button, 8s auto-transition).
-- ✅ JWT login with email allowlist + bcrypt + seeded demo users.
-- ✅ Sidebar shell with 6 nav sections + logout.
-- ✅ Section 1 — Income Tax: 4-step wizard (income profile → docs+regime compare → filing guide → AI review), multi-year config for FY 23-24 → 26-27, deduction caps, 87A rebate, cess, refund maximiser.
-- ✅ Section 2 — GST: supply profile → forms; slab-wise output GST; ITC vs GSTR-2B matching with excess claim warning (Rule 36(4)); Section 17(5) blocked credit detector; 180-day rule; 3-phase filing guide.
-- ✅ Section 3 — Investments: indices ticker, 40 stocks with 30-day area charts, 14 F&O contracts table, 18 MFs, 24 alternatives, portfolio CRUD with P&L + watchlist (persisted to Mongo), goal planner + AI Wealth Advisor, SIP calc, stock comparison, news feed.
-- ✅ Section 4 — Cost Audit: eligibility engine (Sec 148 CRA-1/CRA-3 thresholds), 3-way variance (Books ↔ GSTR ↔ CRA-3), CAS-2 capacity modelling + abnormal-idle flag, cost-financial profit reconciliation, mock MCA XBRL generator with `<in-cca:*>` tags.
-- ✅ Section 5 — TDS/TCS: 11 payment codes 1001-1092, PAN validity checker + 20% default override, per-row threshold status, Form 140 preview.
-- ✅ Section 6 — GST Audit: 5-phase multi-way reconciliation (control totals, variances, 17(5) blocked, Rule 42/43 reversal, 180-day + Sec 50 interest, DRC-03 draft split).
-- ✅ AI panels wired to Claude Sonnet 4.5 / GPT-5.2 via emergentintegrations.
-- ✅ Testing agent: 100% frontend flows, 12/14 backend (AI blocked only by LLM key budget).
+- v1 (MVP): cinematic landing, JWT+cookie login, all 6 sections functional end-to-end, AI advisor wired to Claude/GPT.
+- v1.1 (code-review): httpOnly cookie migration, split useMemos, stable ids, extracted LoginPanel + IndicesTicker, Python type hints.
+- v1.2 (feature bundle): **Income Tax** deductions/exemptions/perquisites catalog with one-click "Add"; **Investments** Lumpsum Advisor (land/gold/flat/MF/stocks/FD split with amount-aware verdict) + per-holding Buy/Sell/Hold trade signals + SignalCard on Stocks tab; **Cost Audit** rewritten as strict 4-phase gated wizard (upload gates + AI Review Data + downloadable text draft).
 
-## Known Issues
-- ⚠️ **AI endpoints require budget on the Emergent LLM Key** — currently `Max budget: 0.0`. Once topped up (Profile → Universal Key → Add Balance), Claude & GPT panels work immediately without code change.
+## Test Results
+- iteration_1: backend 12/14, frontend 100%.
+- iteration_2: backend 17/17, frontend 100%.
+- iteration_3: **backend 17/17** (after LLM key rotation), **frontend 100%** on all three feature bundles.
+- Deployment agent: **PASS** — no blockers.
 
-## Prioritised Backlog
-- **P1**: PDF export of Wealth Advisor report (deferred from v1).
-- **P1**: Alpha Vantage live-price integration behind existing seeded fallback.
-- **P2**: Real doc upload + OCR extraction for Form 16 / GSTR-2B.
-- **P2**: Multi-tenant workspaces (CA firm managing multiple clients).
-- **P2**: Advanced streaming responses for AI panels (SSE).
-- **P3**: Signed URL for XBRL download; direct MCA submission API.
+## Backlog (v2)
+- P1: PDF export of Wealth Advisor + Cost Audit reports (currently .txt).
+- P1: Alpha Vantage live prices behind existing seeded fallback.
+- P2: Real doc OCR for Form 16 / GSTR-2B / Trial Balance.
+- P2: Multi-tenant workspaces for CA firms.
+- P2: SSE streaming responses for AI panels.
+- P3: Shareable public snapshot URLs (viral acquisition).
