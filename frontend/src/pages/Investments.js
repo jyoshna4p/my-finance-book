@@ -9,8 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, BarChart, Bar, CartesianGrid, Legend } from "recharts";
 import { Plus, Trash2, TrendingUp, TrendingDown, Sparkles } from "lucide-react";
 import { fmtINR } from "@/lib/taxConfig";
+import { tradeSignal } from "@/lib/signals";
 import AiPanel from "@/components/AiPanel";
 import IndicesTicker from "@/components/IndicesTicker";
+import LumpsumAdvisor from "@/components/LumpsumAdvisor";
 import { getPortfolio, savePortfolio } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -135,6 +137,7 @@ export default function Investments() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              <SignalCard symbol={current.s} base={current.base} currency={current.currency} />
             </div>
             <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 max-h-[440px] overflow-auto">
               <div className="text-xs text-zinc-500 mb-2 font-mono-data uppercase">Universe (40)</div>
@@ -223,14 +226,16 @@ export default function Investments() {
             <div className="lg:col-span-2 bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-zinc-950 text-zinc-500 text-[11px] uppercase font-mono-data">
-                  <tr><th className="text-left px-4 py-3">Symbol</th><th>Qty</th><th>Avg</th><th>LTP</th><th>P&L</th><th></th></tr>
+                  <tr><th className="text-left px-4 py-3">Symbol</th><th>Qty</th><th>Avg</th><th>LTP</th><th>P&L</th><th>Signal</th><th></th></tr>
                 </thead>
                 <tbody>
-                  {holdings.length === 0 && <tr><td colSpan={6} className="text-center text-zinc-500 py-8 text-xs">No holdings yet. Add one below.</td></tr>}
+                  {holdings.length === 0 && <tr><td colSpan={7} className="text-center text-zinc-500 py-8 text-xs">No holdings yet. Add one below.</td></tr>}
                   {holdings.map((h) => {
                     const meta = stockMap[h.sym]; if (!meta) return null;
                     const p = priceFor(meta.s, meta.base);
                     const pnl = (p - h.avg) * h.qty;
+                    const sig = tradeSignal(meta.s, meta.base);
+                    const sigCls = sig.signal === "BUY" ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : sig.signal === "SELL" ? "bg-red-500/15 text-red-300 border-red-500/25" : "bg-yellow-500/15 text-yellow-300 border-yellow-500/25";
                     return (
                       <tr key={`${h.sym}-${h.avg}-${h.qty}`} className="border-t border-zinc-800 text-zinc-300">
                         <td className="px-4 py-2 font-display">{h.sym}</td>
@@ -238,6 +243,7 @@ export default function Investments() {
                         <td className="text-center font-mono-data">{h.avg}</td>
                         <td className="text-center font-mono-data">{p.toFixed(2)}</td>
                         <td className={`text-center font-mono-data ${pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{pnl >= 0 ? "+" : ""}{fmtINR(pnl)}</td>
+                        <td className="text-center"><Badge data-testid={`sig-${h.sym}`} className={`border text-[10px] ${sigCls}`}>{sig.signal}</Badge></td>
                         <td><Button size="sm" variant="ghost" onClick={() => removeHolding(h)}><Trash2 className="w-3.5 h-3.5 text-red-400" /></Button></td>
                       </tr>
                     );
@@ -297,6 +303,10 @@ export default function Investments() {
               label="AI Wealth Advisor"
               buildPrompt={() => `Design a portfolio plan for target ₹${target}, ${horizon} years, ${risk} risk. Preferred markets: Indian + US. Suggest asset allocation weights, top 3 specific stock/fund picks from my universe (${STOCKS.map((s) => s.s).slice(0, 20).join(", ")}) or MFs (${MUTUAL_FUNDS.map((f) => f.n).slice(0, 6).join(", ")}). For each pick include Why / How to execute / Risks. End with a one-line SEBI disclaimer.`}
             />
+          </div>
+
+          <div className="mt-6">
+            <LumpsumAdvisor />
           </div>
         </TabsContent>
 
@@ -388,6 +398,34 @@ function SliderRow({ label, value, onChange, min, max, step, tid }) {
     <div>
       <div className="flex items-center justify-between text-xs text-zinc-400"><span>{label}</span></div>
       <Slider data-testid={tid} value={[value]} min={min} max={max} step={step} onValueChange={(v) => onChange(v[0])} className="mt-2" />
+    </div>
+  );
+}
+
+function SignalCard({ symbol, base, currency }) {
+  const sig = tradeSignal(symbol, base);
+  const tone = sig.signal === "BUY" ? "emerald" : sig.signal === "SELL" ? "red" : "yellow";
+  const cls = {
+    emerald: "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-300",
+    red: "border-red-500/30 bg-red-500/[0.06] text-red-300",
+    yellow: "border-yellow-500/30 bg-yellow-500/[0.06] text-yellow-300",
+  }[tone];
+  const sym = currency === "INR" ? "₹" : "$";
+  return (
+    <div data-testid="signal-card" className={`mt-4 rounded-xl border ${cls} p-4`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[10px] uppercase font-mono-data tracking-widest opacity-80">Trade Signal · Buy/Sell/Hold</div>
+          <div className="font-display text-2xl mt-1">{sig.signal}</div>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div><div className="text-[10px] opacity-70 font-mono-data uppercase">30d Mean</div><div className="font-mono-data text-sm">{sym}{sig.range.mean}</div></div>
+          <div><div className="text-[10px] opacity-70 font-mono-data uppercase">Target</div><div className="font-mono-data text-sm">{sym}{sig.target}</div></div>
+          <div><div className="text-[10px] opacity-70 font-mono-data uppercase">Stop-loss</div><div className="font-mono-data text-sm">{sym}{sig.stopLoss}</div></div>
+        </div>
+      </div>
+      <div className="text-xs text-zinc-300 mt-3 leading-relaxed">{sig.reason}</div>
+      <div className="text-[10px] text-zinc-500 mt-2 font-mono-data">Deterministic heuristic based on 30-day pseudo-live series — not investment advice. SEBI Reg. required for personalised recommendations.</div>
     </div>
   );
 }

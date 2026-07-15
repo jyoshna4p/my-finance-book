@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { computeTax, fmtINR, suggestITR, TAX_YEARS, taxConfig, DEDUCTION_CAPS } from "@/lib/taxConfig";
 import Stepper from "@/components/Stepper";
 import AiPanel from "@/components/AiPanel";
+import DeductionsCatalog from "@/components/DeductionsCatalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -164,6 +165,14 @@ export default function IncomeTax() {
                 {!allowed.length && <div className="text-xs text-zinc-500 col-span-2 md:col-span-3">New Regime — deductions like 80C/80D/HRA are not applicable (except NPS 80CCD(2) via employer).</div>}
               </div>
             </div>
+
+            <DeductionsCatalog
+              profile={{ sources, ded, gross, other, regime }}
+              onAdd={({ code, suggestedValue }) => {
+                setRegime("old"); // catalog additions live in the Old Regime
+                setDed((d) => ({ ...d, [code]: (d[code] || 0) + suggestedValue }));
+              }}
+            />
           </div>
           <div className="space-y-4">
             <ResultCard title={`Old Regime — FY ${year}`} r={oldResult} highlight={cheaper === "old"} />
