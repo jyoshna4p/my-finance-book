@@ -29,10 +29,20 @@ EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
 app = FastAPI(title="My Finance Book API")
 
+# Configure explicit origins to prevent CORS errors when credentials (cookies) are used
+cors_origins_env = os.environ.get("CORS_ORIGINS", "")
+if cors_origins_env and cors_origins_env != "*":
+    origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+else:
+    origins = [
+        "https://my-finance-book.vercel.app",
+        "http://localhost:3000",
+    ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
