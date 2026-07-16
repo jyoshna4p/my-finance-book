@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Finance Book — All-in-one Indian Statutory & Investment Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090b;
+    --surface: #18181b;
+    --surface-2: #27272a;
+    --border: #27272a;
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+    --text-dim: #71717a;
+    --text-dimmer: #52525b;
+    --cyan: #06b6d4;
+    --cyan-2: #22d3ee;
+    --blue: #3b82f6;
+    --violet: #6366f1;
+    --emerald: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); scroll-behavior: smooth; }
+  body { font-family: 'Manrope', system-ui, sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  .display { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; font-weight: 300; }
+  .mono { font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: rgba(6,182,212,0.35); color: #fff; }
+
+  /* ---- Layout container ---- */
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---- Nav ---- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(16px);
+    background: rgba(9,9,11,0.65);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.35);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 24px rgba(6,182,212,0.2), inset 0 0 0 1px rgba(6,182,212,0.15);
+  }
+  .brand-name { font-family: 'Outfit', sans-serif; font-weight: 500; font-size: 16px; letter-spacing: -0.01em; }
+  .nav-links { display: flex; gap: 28px; font-size: 13px; color: var(--text-muted); }
+  .nav-links a:hover { color: var(--cyan-2); }
+  .nav-cta {
+    padding: 9px 20px; border-radius: 999px; font-size: 13px;
+    background: var(--cyan); color: #09090b; font-weight: 600; font-family: 'Outfit';
+    transition: box-shadow 0.3s, transform 0.2s;
+    box-shadow: 0 0 20px rgba(6,182,212,0.35);
+  }
+  .nav-cta:hover { box-shadow: 0 0 35px rgba(6,182,212,0.55); transform: translateY(-1px); }
+
+  /* ---- Hero ---- */
+  .hero {
+    position: relative;
+    min-height: 100vh; padding: 160px 0 100px;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(6,182,212,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6,182,212,0.06) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+    pointer-events: none;
+  }
+  .orb { position: absolute; border-radius: 999px; filter: blur(90px); pointer-events: none; animation: float 14s ease-in-out infinite; }
+  .orb-cyan { width: 520px; height: 520px; background: var(--cyan); opacity: 0.35; top: 12%; left: -10%; }
+  .orb-blue { width: 620px; height: 620px; background: var(--blue); opacity: 0.30; bottom: -18%; right: -12%; animation-delay: 3s; }
+  .orb-violet { width: 380px; height: 380px; background: var(--violet); opacity: 0.28; top: 42%; left: 42%; animation-delay: 5s; }
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(24px,-32px) scale(1.1); }
+  }
+  .hero-inner { position: relative; z-index: 5; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 16px; border-radius: 999px;
+    background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.3);
+    color: var(--cyan-2); font-family: 'JetBrains Mono'; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    margin-bottom: 32px;
+  }
+  .pill .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--cyan-2); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+  h1.hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(44px, 6.5vw, 88px);
+    line-height: 1.02; letter-spacing: -0.03em; font-weight: 200;
+    color: var(--text); max-width: 1000px;
+  }
+  h1.hero-title .accent { color: var(--cyan-2); font-weight: 300; }
+  .hero-sub {
+    max-width: 720px; margin-top: 28px;
+    color: var(--text-muted); font-size: 18px; line-height: 1.65;
+  }
+  .hero-ctas { margin-top: 44px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary, .btn-ghost {
+    padding: 14px 28px; border-radius: 12px;
+    font-family: 'Outfit'; font-weight: 600; font-size: 14px;
+    transition: all 0.25s; cursor: pointer; border: 1px solid transparent;
+  }
+  .btn-primary {
+    background: var(--cyan); color: #09090b;
+    box-shadow: 0 0 24px rgba(6,182,212,0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 0 44px rgba(6,182,212,0.55); transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent; border-color: rgba(255,255,255,0.15); color: var(--text);
+  }
+  .btn-ghost:hover { border-color: rgba(6,182,212,0.5); color: var(--cyan-2); }
+
+  .value-props {
+    margin-top: 96px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;
+  }
+  .vp-card {
+    padding: 22px;
+    background: rgba(9,9,11,0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    backdrop-filter: blur(18px);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .vp-card:hover { border-color: rgba(6,182,212,0.4); transform: translateY(-3px); }
+  .vp-icon { width: 20px; height: 20px; color: var(--cyan-2); margin-bottom: 14px; }
+  .vp-title { font-family: 'Outfit'; font-size: 14px; font-weight: 500; }
+  .vp-desc { color: var(--text-dim); font-size: 12px; margin-top: 6px; line-height: 1.55; }
+
+  .versus {
+    margin-top: 56px;
+    display: flex; gap: 32px; flex-wrap: wrap;
+    color: var(--text-dim); font-size: 12px; font-family: 'JetBrains Mono';
+  }
+  .versus .k { display: flex; align-items: center; gap: 10px; }
+  .versus .k .swatch { width: 8px; height: 8px; border-radius: 999px; }
+
+  /* ---- Section shells ---- */
+  section.mod {
+    padding: 120px 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .eyebrow { color: var(--cyan-2); font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; }
+  h2.mod-title {
+    font-family: 'Outfit'; font-weight: 200; font-size: clamp(32px, 4vw, 52px);
+    letter-spacing: -0.025em; margin-top: 12px; max-width: 780px;
+  }
+  h2.mod-title .accent { color: var(--cyan-2); font-weight: 300; }
+  .mod-sub { color: var(--text-muted); margin-top: 20px; max-width: 720px; line-height: 1.65; }
+
+  /* ---- Card patterns ---- */
+  .panel {
+    background: rgba(24,24,27,0.6); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat {
+    background: rgba(24,24,27,0.6); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+  }
+  .stat-label { font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); }
+  .stat-value { font-family: 'JetBrains Mono'; font-size: 28px; margin-top: 10px; color: var(--text); }
+  .badge {
+    display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px;
+    font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 0.06em;
+    border: 1px solid; text-transform: uppercase;
+  }
+  .b-green  { color: var(--emerald); border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.08); }
+  .b-red    { color: var(--red); border-color: rgba(248,113,113,0.35); background: rgba(248,113,113,0.08); }
+  .b-yellow { color: var(--yellow); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.08); }
+  .b-cyan   { color: var(--cyan-2); border-color: rgba(34,211,238,0.35); background: rgba(34,211,238,0.08); }
+
+  /* ---- Stepper ---- */
+  .stepper { display: flex; gap: 8px; margin: 32px 0; flex-wrap: wrap; }
+  .step {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 10px;
+    background: rgba(9,9,11,0.6); border: 1px solid var(--border);
+    color: var(--text-dim); font-family: 'Outfit'; font-size: 13px;
+  }
+  .step .n {
+    width: 22px; height: 22px; border-radius: 999px;
+    background: var(--surface-2); font-family: 'JetBrains Mono'; font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step.done { color: var(--emerald); border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.06); }
+  .step.done .n { background: rgba(52,211,153,0.25); color: var(--emerald); }
+  .step.cur { color: var(--cyan-2); border-color: rgba(6,182,212,0.5); background: rgba(6,182,212,0.08); }
+  .step.cur .n { background: rgba(6,182,212,0.25); color: var(--cyan-2); }
+
+  /* ---- Table ---- */
+  table.mfb-table { width: 100%; border-collapse: collapse; }
+  table.mfb-table th, table.mfb-table td { padding: 12px 16px; text-align: left; font-size: 13px; }
+  table.mfb-table thead th {
+    background: rgba(9,9,11,0.6); border-bottom: 1px solid var(--border);
+    color: var(--text-dim); font-family: 'JetBrains Mono'; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500;
+  }
+  table.mfb-table tbody td { border-bottom: 1px solid rgba(39,39,42,0.6); }
+  table.mfb-table tbody tr:hover { background: rgba(39,39,42,0.35); }
+  .num { font-family: 'JetBrains Mono'; font-variant-numeric: tabular-nums; }
+  .pos { color: var(--emerald); }
+  .neg { color: var(--red); }
+
+  /* ---- Mini chart (SVG) ---- */
+  .chart { width: 100%; height: 200px; }
+
+  /* ---- Ticker ---- */
+  .ticker-wrap { background: #09090b; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .ticker { display: flex; gap: 42px; padding: 14px 24px; white-space: nowrap; animation: scroll 55s linear infinite; }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .ticker span { font-family: 'JetBrains Mono'; font-size: 13px; color: var(--text-muted); }
+  .ticker .sym { color: var(--text); font-family: 'Outfit'; margin-right: 8px; }
+
+  /* ---- Feature list ---- */
+  .feat-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
+  .feat {
+    padding: 18px; border: 1px solid var(--border); border-radius: 12px;
+    background: rgba(9,9,11,0.5);
+  }
+  .feat h4 { font-family: 'Outfit'; font-weight: 500; font-size: 14px; }
+  .feat p { font-size: 12px; color: var(--text-dim); margin-top: 8px; line-height: 1.6; }
+
+  /* ---- Alert cards ---- */
+  .alert {
+    padding: 16px; border-radius: 12px; border: 1px solid;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .alert.warn { border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.05); color: var(--yellow); }
+  .alert.err  { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.05); color: var(--red); }
+  .alert.ok   { border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.05); color: var(--emerald); }
+  .alert.info { border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.05); color: var(--cyan-2); }
+  .alert .body { color: var(--text-muted); font-size: 12.5px; line-height: 1.6; }
+  .alert .body b { color: var(--text); }
+
+  /* ---- XBRL preview ---- */
+  pre.xbrl {
+    background: #09090b; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    font-family: 'JetBrains Mono'; font-size: 11px; color: #a7f3d0;
+    white-space: pre-wrap; word-break: break-word; overflow: auto; max-height: 380px;
+  }
+
+  /* ---- CTA / footer ---- */
+  .cta-final {
+    position: relative;
+    text-align: center; padding: 140px 32px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(6,182,212,0.12), transparent 60%),
+      linear-gradient(180deg, transparent, rgba(6,182,212,0.05));
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .cta-final h2 {
+    font-family: 'Outfit'; font-weight: 200; font-size: clamp(36px,4.5vw,56px);
+    letter-spacing: -0.025em; max-width: 780px; margin: 0 auto;
+  }
+  .cta-final .accent { color: var(--cyan-2); }
+  .cta-final p { color: var(--text-muted); max-width: 620px; margin: 24px auto 40px; }
+  footer {
+    padding: 40px 32px; text-align: center;
+    color: var(--text-dimmer); font-family: 'JetBrains Mono'; font-size: 11px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  footer .row { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .wrap { padding: 0 20px; }
+    .hero { padding: 140px 0 80px; }
+    section.mod { padding: 80px 0; }
+    .ticker { animation-duration: 40s; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--cyan-2)"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
+    </div>
+    <span class="brand-name">My Finance Book</span>
+  </div>
+  <div class="nav-links">
+    <a href="#income-tax">Income Tax</a>
+    <a href="#gst">GST</a>
+    <a href="#investments">Investments</a>
+    <a href="#cost-audit">Cost Audit</a>
+    <a href="#tds">TDS</a>
+    <a href="#audit">Audit</a>
+  </div>
+  <a class="nav-cta" href="#cta">Unlock Dashboard →</a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="orb orb-cyan"></div>
+  <div class="orb orb-blue"></div>
+  <div class="orb orb-violet"></div>
+  <div class="wrap hero-inner">
+    <div class="pill"><span class="dot"></span> My Finance Book · v2026</div>
+    <h1 class="hero-title">One book to run <span class="accent">every</span><br/>statutory obligation you have.</h1>
+    <p class="hero-sub">Automated Income Tax filing · GST Multi-way Reconciliation · Indian &amp; US portfolios · Section 148 Cost Audit + MCA XBRL · Live TDS/TCS tracking under the 2026 mandate.</p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#cta">Unlock Dashboard →</a>
+      <a class="btn-ghost" href="#income-tax">See the modules ↓</a>
+    </div>
+
+    <div class="value-props">
+      <div class="vp-card">
+        <svg class="vp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7l9 5 9-5-9-5z"/><path d="M3 17l9 5 9-5"/><path d="M3 12l9 5 9-5"/></svg>
+        <div class="vp-title">All-in-one Compliance</div>
+        <div class="vp-desc">Income Tax, GST, TDS/TCS, Cost Audit (CRA-3), MCA XBRL — one login.</div>
+      </div>
+      <div class="vp-card">
+        <svg class="vp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div class="vp-title">Instant Multi-Ledger Recon</div>
+        <div class="vp-desc">3-way cross-check between Books, GSTR-1/3B/2B and CRA cost records.</div>
+      </div>
+      <div class="vp-card">
+        <svg class="vp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        <div class="vp-title">Predictive AI Diagnostics</div>
+        <div class="vp-desc">Powered by Claude 4.5 &amp; GPT-5.2 — flag risks before the notice arrives.</div>
+      </div>
+      <div class="vp-card">
+        <svg class="vp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg>
+        <div class="vp-title">Portfolio Intelligence</div>
+        <div class="vp-desc">Indian &amp; US equities, F&amp;O, Mutual Funds, PPF/NPS/SGB tracked live.</div>
+      </div>
+    </div>
+
+    <div class="versus">
+      <div class="k"><span class="swatch" style="background:var(--red)"></span> COMPETITORS: manual files, isolated tools, delayed spreadsheets</div>
+      <div class="k"><span class="swatch" style="background:var(--cyan-2)"></span> US: real-time recon, statutory limits, predictive AI</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 1 · INCOME TAX ============ -->
+<section id="income-tax" class="mod">
+  <div class="wrap">
+    <div class="eyebrow">Section 1</div>
+    <h2 class="mod-title">Income Tax — <span class="accent">refund maximised</span> across every regime, every FY.</h2>
+    <p class="mod-sub">FY 2023-24 → FY 2026-27 rules baked in. A 4-step wizard walks salaried, business and F&amp;O filers through document upload → old vs new regime compare → step-by-step e-filing → AI review.</p>
+
+    <div class="stepper" style="margin-top: 40px;">
+      <div class="step done"><span class="n">✓</span> Income Profile</div>
+      <div class="step cur"><span class="n">2</span> Regime Compare</div>
+      <div class="step"><span class="n">3</span> Filing Guide</div>
+      <div class="step"><span class="n">4</span> AI Review</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="font-family:'Outfit'; font-size:16px;">Income &amp; Deductions — FY 2026-27</div>
+          <div style="display:flex; gap:6px;">
+            <span class="badge b-cyan">New Regime</span>
+            <span class="badge" style="color:var(--text-dim); border-color: var(--border)">Old Regime</span>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div><div class="stat-label">Gross Salary</div><div class="num" style="font-size:20px; margin-top:8px;">₹15,00,000</div></div>
+          <div><div class="stat-label">Other Income</div><div class="num" style="font-size:20px; margin-top:8px;">₹45,000</div></div>
+          <div><div class="stat-label">TDS Paid</div><div class="num" style="font-size:20px; margin-top:8px;">₹1,20,000</div></div>
+          <div><div class="stat-label">80C</div><div class="num" style="font-size:20px; margin-top:8px; color:var(--text-dim)">— locked in New</div></div>
+          <div><div class="stat-label">80D</div><div class="num" style="font-size:20px; margin-top:8px; color:var(--text-dim)">— locked in New</div></div>
+          <div><div class="stat-label">HRA</div><div class="num" style="font-size:20px; margin-top:8px; color:var(--text-dim)">— locked in New</div></div>
+        </div>
+
+        <div style="margin-top:24px; padding-top:20px; border-top: 1px solid var(--border);">
+          <div style="font-family:'Outfit'; font-size:14px; margin-bottom:12px;">Personalised Deductions / Exemptions / Perquisites</div>
+          <div class="feat-list">
+            <div class="feat">
+              <span class="badge b-cyan" style="margin-bottom:8px;">Recommended</span>
+              <h4>80TTA · Savings Interest</h4>
+              <p>You have savings-account income — claim up to ₹10,000 automatically.</p>
+            </div>
+            <div class="feat">
+              <span class="badge b-cyan" style="margin-bottom:8px;">Recommended</span>
+              <h4>80CCD(1B) · NPS Extra</h4>
+              <p>₹50,000 over-and-above 80C, allowed even under New Regime via employer.</p>
+            </div>
+            <div class="feat">
+              <span class="badge b-green" style="margin-bottom:8px;">Already claimed</span>
+              <h4>80C · PPF / ELSS / EPF</h4>
+              <p>You've maxed the ₹1.5L cap. Nice.</p>
+            </div>
+            <div class="feat">
+              <span class="badge" style="color:var(--text-dim); border-color:var(--border); margin-bottom:8px;">New Regime blocks</span>
+              <h4>HRA · House Rent</h4>
+              <p>Switch to Old Regime to reclaim your rent receipts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="panel" style="border-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.06);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-family:'Outfit'; font-size:14px;">New Regime · Cheaper</div>
+            <span class="badge b-cyan">₹75k std ded</span>
+          </div>
+          <div class="stat-label" style="margin-top:16px;">Taxable Income</div>
+          <div class="num" style="font-size:18px;">₹14,25,000</div>
+          <div class="stat-label" style="margin-top:12px;">Total Tax</div>
+          <div class="num" style="font-size:18px;">₹1,17,000</div>
+          <div style="margin-top:16px; padding:14px; border-radius:10px; background: rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.3); text-align:center;">
+            <div class="stat-label" style="color: var(--emerald);">Expected Refund</div>
+            <div class="num" style="font-size:26px; color: var(--emerald); margin-top:6px;">₹3,000</div>
+          </div>
+        </div>
+        <div class="alert warn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          <div class="body"><b>Refund Maximizer:</b> Switching to Old Regime with your ₹22k HRA + full 80C/80D would give you ₹48,200 refund. Delta ₹45,200 — <span style="color:var(--yellow)">worth switching.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 2 · GST ============ -->
+<section id="gst" class="mod">
+  <div class="wrap">
+    <div class="eyebrow">Section 2</div>
+    <h2 class="mod-title">GST — <span class="accent">block-credit sniffer</span> that stops the notice before it lands.</h2>
+    <p class="mod-sub">4-step wizard covers B2B/B2C profiling, ITC vs GSTR-2B matching, Section 17(5) blocked-credit detector and the strict phase-locked filing sequence (GSTR-1 → 2B → 3B).</p>
+
+    <div class="grid-2" style="margin-top:32px;">
+      <div class="panel">
+        <div style="font-family:'Outfit'; font-size:16px; margin-bottom:16px;">Outward Supplies (Sales)</div>
+        <div class="grid-4">
+          <div><div class="stat-label">Slab 5%</div><div class="num" style="font-size:16px; margin-top:6px;">₹0</div></div>
+          <div><div class="stat-label">Slab 12%</div><div class="num" style="font-size:16px; margin-top:6px;">₹5,00,000</div></div>
+          <div><div class="stat-label">Slab 18%</div><div class="num" style="font-size:16px; margin-top:6px;">₹22,00,000</div></div>
+          <div><div class="stat-label">Slab 28%</div><div class="num" style="font-size:16px; margin-top:6px;">₹0</div></div>
+        </div>
+        <div style="margin-top:20px; padding-top:20px; border-top: 1px solid var(--border);">
+          <div style="font-family:'Outfit'; font-size:14px; margin-bottom:14px;">Blocked Credit Checks (Sec 17(5))</div>
+          <div class="feat-list">
+            <div class="feat" style="border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04);">
+              <h4 style="color: var(--red);">Motor Vehicles (≤13 seats)</h4>
+              <p>ITC reversed automatically. Sec 17(5)(a).</p>
+            </div>
+            <div class="feat" style="border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04);">
+              <h4 style="color: var(--red);">Outdoor Catering</h4>
+              <p>Blocked unless mandated by law. Sec 17(5)(b)(i).</p>
+            </div>
+            <div class="feat" style="border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.04);">
+              <h4 style="color: var(--yellow);">Supplier unpaid &gt; 180 days</h4>
+              <p>Reverse ITC with 18% p.a. interest. Sec 16(2)(d).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="stat"><div class="stat-label">Gross Output GST</div><div class="stat-value">₹4,56,000</div></div>
+        <div class="stat"><div class="stat-label">Eligible ITC (GSTR-2B)</div><div class="stat-value" style="color: var(--emerald);">₹2,60,000</div></div>
+        <div class="panel" style="border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.05);">
+          <div class="stat-label" style="color: var(--red);">Net Cash GST Payable</div>
+          <div class="stat-value" style="color: var(--red);">₹1,96,000</div>
+        </div>
+        <div class="alert err">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+          <div class="body"><b>Illegal provisional ITC of ₹20,000.</b> Rule 36(4) permits only ITC visible in GSTR-2B. Excess claim risks Section 73/74 notice.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 3 · INVESTMENTS ============ -->
+<section id="investments" class="mod">
+  <div class="wrap">
+    <div class="eyebrow">Section 3</div>
+    <h2 class="mod-title">Investments &amp; AI Wealth — <span class="accent">40 stocks, 14 F&amp;O, 18 MFs, 24 alternatives.</span></h2>
+    <p class="mod-sub">Indian and US equities live. AI Wealth Advisor (Claude Sonnet 4.5) recommends allocation from your Goal Planner. Lumpsum Advisor splits ₹50 Lakhs across Land / Gold / Flat / MF / Stocks with an amount-aware verdict.</p>
+
+    <div class="ticker-wrap" style="margin-top:32px;">
+      <div class="ticker">
+        <span><span class="sym">NIFTY 50</span> 24,850 <span class="pos">+0.24%</span></span>
+        <span><span class="sym">SENSEX</span> 81,420 <span class="pos">+0.31%</span></span>
+        <span><span class="sym">BANK NIFTY</span> 52,310 <span class="neg">−0.18%</span></span>
+        <span><span class="sym">NIFTY IT</span> 42,150 <span class="pos">+0.87%</span></span>
+        <span><span class="sym">S&amp;P 500</span> 5,880 <span class="pos">+0.42%</span></span>
+        <span><span class="sym">NASDAQ</span> 19,240 <span class="pos">+0.68%</span></span>
+        <span><span class="sym">DOW</span> 43,120 <span class="neg">−0.05%</span></span>
+        <span><span class="sym">FTSE 100</span> 8,210 <span class="pos">+0.11%</span></span>
+        <!-- repeat for seamless loop -->
+        <span><span class="sym">NIFTY 50</span> 24,850 <span class="pos">+0.24%</span></span>
+        <span><span class="sym">SENSEX</span> 81,420 <span class="pos">+0.31%</span></span>
+        <span><span class="sym">BANK NIFTY</span> 52,310 <span class="neg">−0.18%</span></span>
+        <span><span class="sym">NIFTY IT</span> 42,150 <span class="pos">+0.87%</span></span>
+        <span><span class="sym">S&amp;P 500</span> 5,880 <span class="pos">+0.42%</span></span>
+        <span><span class="sym">NASDAQ</span> 19,240 <span class="pos">+0.68%</span></span>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div class="stat-label">NSE · Energy</div>
+            <div style="font-family:'Outfit'; font-size:22px; margin-top:6px;">Reliance Industries</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="num" style="font-size:28px;">₹2,970.20</div>
+            <div class="num" style="font-size:12px; color: var(--emerald);">+0.69% · 30d</div>
+          </div>
+        </div>
+        <svg class="chart" viewBox="0 0 400 160" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.5" />
+              <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path d="M0,120 L20,110 L40,115 L60,100 L80,95 L100,102 L120,88 L140,80 L160,90 L180,82 L200,70 L220,74 L240,60 L260,68 L280,52 L300,58 L320,48 L340,55 L360,42 L380,38 L400,44 L400,160 L0,160 Z" fill="url(#g1)"/>
+          <path d="M0,120 L20,110 L40,115 L60,100 L80,95 L100,102 L120,88 L140,80 L160,90 L180,82 L200,70 L220,74 L240,60 L260,68 L280,52 L300,58 L320,48 L340,55 L360,42 L380,38 L400,44" fill="none" stroke="#06b6d4" stroke-width="2"/>
+        </svg>
+        <div class="alert ok" style="margin-top:16px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="body">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <b style="color:var(--emerald);">BUY · Signal</b>
+              <span class="num" style="color:var(--emerald);">Target ₹3,340 · Stop ₹2,790</span>
+            </div>
+            Trading 2.8% below its 30-day mean and 0.7% below fair value — accumulate on dips.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="stat"><div class="stat-label">Total Invested</div><div class="stat-value">₹8,50,000</div></div>
+        <div class="stat" style="border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.05);"><div class="stat-label">Current Value</div><div class="stat-value" style="color: var(--emerald);">₹10,64,560</div></div>
+        <div class="stat" style="border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.05);"><div class="stat-label">Unrealised P&amp;L</div><div class="stat-value" style="color: var(--emerald);">+ ₹2,14,560</div></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div style="font-family:'Outfit'; font-size:16px;">Lumpsum Allocation · ₹50,00,000 · Moderate risk</div>
+        <span class="badge b-cyan">Land-heavy split</span>
+      </div>
+      <div class="grid-3">
+        <div class="feat"><h4>🏗 Plot / Land · 20%</h4><p class="num" style="color: var(--cyan-2); font-size:18px; margin-top:6px;">₹10,00,000</p><p>Buy where infrastructure is going, not where it already is. Highest long-term appreciation.</p></div>
+        <div class="feat"><h4>🪙 Gold (SGB) · 15%</h4><p class="num" style="color: var(--cyan-2); font-size:18px; margin-top:6px;">₹7,50,000</p><p>2.5% interest + zero LTCG on maturity. Better than jewellery.</p></div>
+        <div class="feat"><h4>🏢 Flat · 25%</h4><p class="num" style="color: var(--cyan-2); font-size:18px; margin-top:6px;">₹12,50,000</p><p>Rental yield 2.5-3.5%. RERA-registered only. Verify OC + CC before payout.</p></div>
+        <div class="feat"><h4>📈 Mutual Funds (STP) · 20%</h4><p class="num" style="color: var(--cyan-2); font-size:18px; margin-top:6px;">₹10,00,000</p><p>Deploy 60% at once, STP the rest over 6–12 months.</p></div>
+        <div class="feat"><h4>🎯 Direct Equity · 15%</h4><p class="num" style="color: var(--cyan-2); font-size:18px; margin-top:6px;">₹7,50,000</p><p>Own the top 8-10 large-caps directly. Zero expense ratio.</p></div>
+        <div class="feat"><h4>💵 Emergency FD · 5%</h4><p class="num" style="color: var(--cyan-2); font-size:18px; margin-top:6px;">₹2,50,000</p><p>6 months of expenses in a sweep-in FD before deploying growth assets.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 · COST AUDIT ============ -->
+<section id="cost-audit" class="mod">
+  <div class="wrap">
+    <div class="eyebrow">Section 4</div>
+    <h2 class="mod-title">Cost Audit &amp; CMA — <span class="accent">Companies Act §148</span>, gated 4-phase workflow.</h2>
+    <p class="mod-sub">Statutory eligibility → 3-ledger reconciliation with material/labor/overhead comparator → bulk operational upload + AI Review Data → downloadable draft report with MCA XBRL payload. Each phase locks the next until completed.</p>
+
+    <div class="stepper" style="margin-top:40px;">
+      <div class="step done"><span class="n">✓</span> Eligibility</div>
+      <div class="step done"><span class="n">✓</span> Accounts Recon</div>
+      <div class="step cur"><span class="n">3</span> Variance &amp; AI Review</div>
+      <div class="step"><span class="n">4</span> Audit Report</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div style="font-family:'Outfit'; font-size:16px; margin-bottom:16px;">AI Review Data — 5 components scanned</div>
+        <table class="mfb-table">
+          <thead><tr><th>Component</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Material Consumption <div style="color:var(--text-dim); font-size:11px;">Cost ledger over by ₹2,00,000 vs P&amp;L</div></td><td><span class="badge b-yellow">Manual review</span></td></tr>
+            <tr><td>Labor / Employee (CAS-7) <div style="color:var(--text-dim); font-size:11px;">Variance ₹2,00,000</div></td><td><span class="badge b-yellow">Manual review</span></td></tr>
+            <tr><td>Utility Consumption / Unit <div style="color:var(--text-dim); font-size:11px;">Q3 spike detected — check boiler efficiency</div></td><td><span class="badge b-yellow">Manual review</span></td></tr>
+            <tr><td>Overhead Absorption (CAS-3) <div style="color:var(--text-dim); font-size:11px;">Variance ₹4,00,000</div></td><td><span class="badge b-green">Accurate</span></td></tr>
+            <tr><td>Production Log Integrity <div style="color:var(--text-dim); font-size:11px;">No mismatches beyond ±0.4%</div></td><td><span class="badge b-green">Accurate</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="stat"><div class="stat-label">Utilisation</div><div class="stat-value" style="color: var(--cyan-2);">82.8%</div></div>
+        <div class="stat" style="border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.05);"><div class="stat-label">Abnormal Idle Capacity</div><div class="stat-value" style="color: var(--yellow);">12.3%</div></div>
+        <div class="stat" style="border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.05);"><div class="stat-label">Reconciled Profit</div><div class="stat-value" style="color: var(--emerald);">₹1,49,80,000</div></div>
+        <div class="alert warn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          <div class="body"><b>Insight:</b> Abnormal idle capacity of 12.3% is inflating unit cost. Strip these fixed overheads to P&amp;L per CAS-2 §5.7 as an unabsorbed variance.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-family:'Outfit'; font-size:16px;">MCA XBRL Instance (mock CRA-3)</div>
+        <span class="badge b-cyan">Download-ready</span>
+      </div>
+<pre class="xbrl">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xbrl xmlns="http://www.xbrl.org/2003/instance"
+      xmlns:in-cca="http://www.mca.gov.in/xbrl/cost-audit/2020"&gt;
+  &lt;in-cca:CorporateIdentityNumber&gt;U27100MH2018PTC012345&lt;/in-cca:CorporateIdentityNumber&gt;
+  &lt;in-cca:SectorClassification&gt;Non-Regulated&lt;/in-cca:SectorClassification&gt;
+  &lt;in-cca:ProductServiceDetailsTable&gt;
+    &lt;in-cca:AggregateTurnover&gt;40,00,00,000&lt;/in-cca:AggregateTurnover&gt;
+  &lt;/in-cca:ProductServiceDetailsTable&gt;
+  &lt;in-cca:QuantitativeInformationProduction&gt;
+    &lt;in-cca:InstalledCapacityHours&gt;87600&lt;/in-cca:InstalledCapacityHours&gt;
+    &lt;in-cca:AchievableCapacityHours&gt;83220&lt;/in-cca:AchievableCapacityHours&gt;
+    &lt;in-cca:ActualProductionHours&gt;72500&lt;/in-cca:ActualProductionHours&gt;
+    &lt;in-cca:AbnormalIdleCapacityHours&gt;10720&lt;/in-cca:AbnormalIdleCapacityHours&gt;
+  &lt;/in-cca:QuantitativeInformationProduction&gt;
+  &lt;in-cca:CostReconciliationStatementTable&gt;
+    &lt;in-cca:ProfitAsPerCostRecords&gt;1,52,00,000&lt;/in-cca:ProfitAsPerCostRecords&gt;
+    &lt;in-cca:IncomeNotConsideredInCost&gt;1,20,000&lt;/in-cca:IncomeNotConsideredInCost&gt;
+    &lt;in-cca:ExpenseNotConsideredInCost&gt;3,40,000&lt;/in-cca:ExpenseNotConsideredInCost&gt;
+    &lt;in-cca:ReconciledFinancialProfit&gt;1,49,80,000&lt;/in-cca:ReconciledFinancialProfit&gt;
+  &lt;/in-cca:CostReconciliationStatementTable&gt;
+&lt;/xbrl&gt;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 · TDS/TCS ============ -->
+<section id="tds" class="mod">
+  <div class="wrap">
+    <div class="eyebrow">Section 5</div>
+    <h2 class="mod-title">TDS / TCS Ledger — <span class="accent">Tax Year 2026-27</span>, Payment Codes 1001-1092.</h2>
+    <p class="mod-sub">Income Tax Act, 2025 codes replace legacy section numbers. Missing PAN auto-defaults to 20%. Threshold warnings fire at 85%. Quarterly Form 140 / Form 131 data structure generated in one click.</p>
+
+    <div class="panel" style="margin-top:32px; padding:0; overflow:hidden;">
+      <table class="mfb-table">
+        <thead>
+          <tr><th>Vendor</th><th>PAN</th><th>Code</th><th>YTD</th><th>This</th><th>Rate</th><th>TDS</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ABC Contractor</td>
+            <td class="num">AABCA1234E</td>
+            <td class="num" style="color:var(--cyan-2);">1022 <div style="color:var(--text-dim); font-size:10px;">Contractor Ind/HUF</div></td>
+            <td class="num">₹85,000</td>
+            <td class="num">₹25,000</td>
+            <td class="num">1.0%</td>
+            <td class="num">₹250</td>
+            <td><span class="badge b-yellow">85% reached</span></td>
+          </tr>
+          <tr>
+            <td>XYZ Consulting</td>
+            <td class="num" style="color:var(--red);">— missing —</td>
+            <td class="num" style="color:var(--cyan-2);">1034 <div style="color:var(--text-dim); font-size:10px;">Professional</div></td>
+            <td class="num">₹45,000</td>
+            <td class="num">₹15,000</td>
+            <td class="num" style="color:var(--red);">20.0% <div style="font-size:10px;">PAN → 20%</div></td>
+            <td class="num">₹3,000</td>
+            <td><span class="badge b-red">Threshold hit</span></td>
+          </tr>
+          <tr>
+            <td>Rentwell LLP</td>
+            <td class="num">AAAFR9876Q</td>
+            <td class="num" style="color:var(--cyan-2);">1044 <div style="color:var(--text-dim); font-size:10px;">Rent — Building</div></td>
+            <td class="num">₹2,20,000</td>
+            <td class="num">₹30,000</td>
+            <td class="num">10.0%</td>
+            <td class="num">₹3,000</td>
+            <td><span class="badge" style="color:var(--text-dim); border-color:var(--border);">OK</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert err" style="margin-top:20px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+      <div class="body"><b>1 vendor has missing / invalid PAN.</b> Under IT Act 2025, deduct TDS at a hard 20% irrespective of the code. Chase the PAN before Q3 filing.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 · GST AUDIT ============ -->
+<section id="audit" class="mod">
+  <div class="wrap">
+    <div class="eyebrow">Section 6</div>
+    <h2 class="mod-title">GST Audit — <span class="accent">5-phase multi-way</span> reconciliation with DRC-03 directives.</h2>
+    <p class="mod-sub">Books ↔ GSTR-1 ↔ GSTR-3B ↔ GSTR-2B ↔ Purchase Register in one shot. Section 17(5) blocked ITC, Rule 42/43 reversal, 180-day rule and Sec 50 late-filing interest are all computed automatically into a ready-to-pay DRC-03 draft.</p>
+
+    <div class="grid-2" style="margin-top:32px;">
+      <div class="panel">
+        <div style="font-family:'Outfit'; font-size:16px; margin-bottom:12px;">Phase 2 · Multi-Way Variances</div>
+        <div class="feat-list">
+          <div class="feat" style="border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.04);">
+            <h4 style="color: var(--yellow);">GSTR-1 vs GSTR-3B (Output)</h4><p class="num" style="color: var(--yellow); font-size:16px; margin-top:6px;">₹1,70,000</p>
+          </div>
+          <div class="feat" style="border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04);">
+            <h4 style="color: var(--red);">ITC 3B vs GSTR-2B</h4><p class="num" style="color: var(--red); font-size:16px; margin-top:6px;">₹1,30,000</p>
+          </div>
+          <div class="feat" style="border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.05);">
+            <h4 style="color: var(--emerald);">ITC 3B vs Purchase Reg</h4><p class="num" style="color: var(--emerald); font-size:16px; margin-top:6px;">−₹30,000</p>
+          </div>
+          <div class="feat" style="border-color: var(--border);">
+            <h4 style="color: var(--text-muted);">P&amp;L @18% vs GSTR-1</h4><p class="num" style="color: var(--text-muted); font-size:16px; margin-top:6px;">approx OK</p>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="panel" style="border-color: rgba(248,113,113,0.35); background: rgba(248,113,113,0.05);">
+          <div class="stat-label" style="color: var(--red);">Ultimate Additional Liability</div>
+          <div class="num" style="color: var(--red); font-size: 42px; margin-top: 8px;">₹4,42,000</div>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 12px; line-height: 1.6;">Bridge this shortfall using <b style="color:var(--text);">Form DRC-03 (Voluntary Payment)</b> — head-wise split (Tax + Interest + Penalty).</p>
+        </div>
+        <div class="panel" style="border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.05);">
+          <div style="color: var(--cyan-2); font-family: 'Outfit'; font-size: 14px; margin-bottom: 12px;">DRC-03 Draft Split</div>
+          <div style="display:flex; justify-content:space-between; font-size: 13px; margin-bottom: 8px;"><span style="color: var(--text-muted);">Tax head (output + blocked ITC)</span><span class="num">₹4,45,000</span></div>
+          <div style="display:flex; justify-content:space-between; font-size: 13px; margin-bottom: 8px;"><span style="color: var(--text-muted);">Interest (Sec 50 + 180d)</span><span class="num">₹36,600</span></div>
+          <div style="display:flex; justify-content:space-between; font-size: 13px; padding-top: 8px; border-top: 1px solid var(--border);"><span style="color: var(--text);">Total to bridge</span><span class="num" style="color:var(--cyan-2);">₹4,81,600</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section id="cta" class="cta-final">
+  <h2>Ready to run every ledger through <span class="accent">one book</span>?</h2>
+  <p>Login is gated behind a pre-approved email allowlist — Royal Enfield RE-One style. bcrypt + JWT + httpOnly cookie. Zero data leaves your session.</p>
+  <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+    <a class="btn-primary" href="mailto:hello@myfinancebook.in?subject=Request%20access">Request access</a>
+    <a class="btn-ghost" href="#income-tax">Tour the modules again</a>
+  </div>
+</section>
+
+<footer>
+  <div class="row">
+    <span>© 2026 My Finance Book · Built for Indian CAs, CFOs &amp; SMEs</span>
+    <span>bcrypt · JWT · SEBI/MCA aligned</span>
+  </div>
+</footer>
+
+</body>
+</html>

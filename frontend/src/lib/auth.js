@@ -1,40 +1,32 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { fetchMe, logout as apiLogout } from "./api";
 
 const Ctx = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Set to false since we aren't waiting for a server anymore
 
-  const refresh = useCallback(async () => {
-    try {
-      const r = await fetchMe();
-      setUser(r.user || null);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
+  // Custom login function for your specific credentials
+  const login = useCallback(async (email, password) => {
+    if (email === "jyoshna4p@gmail.com" && password === "Jyoshna@20") {
+      const mockUser = { email: email, name: "Jyoshna" };
+      setUser(mockUser);
+      return mockUser;
     }
-  }, []);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  const setSession = useCallback((_token, u) => {
-    // Session is now stored server-side in an httpOnly cookie.
-    // We only track the user object in memory for UI.
-    setUser(u);
+    throw new Error("Invalid credentials");
   }, []);
 
   const doLogout = useCallback(async () => {
-    try { await apiLogout(); } catch { /* ignore */ }
     setUser(null);
   }, []);
 
+  const refresh = useCallback(async () => {
+    // Keep session alive in UI memory if needed
+    setLoading(false);
+  }, []);
+
   return (
-    <Ctx.Provider value={{ user, setSession, doLogout, loading, refresh }}>
+    <Ctx.Provider value={{ user, login, doLogout, loading, refresh }}>
       {children}
     </Ctx.Provider>
   );
